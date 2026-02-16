@@ -89,12 +89,27 @@ Single YAML: `detector_type`, regex rules, thresholds. See `config.example.yml` 
 
 Requires `pip install -e ".[crypto]"` and env `TOKEN_KEY_HEX` (64 hex chars, e.g. `openssl rand -hex 32`).
 
-**CLI:**
+**CLI — write to JSON and decrypt from JSON:**
+
+```bash
+# Key (once per session or in .env)
+export TOKEN_KEY_HEX=$(openssl rand -hex 32)
+
+# Mask + encrypt: output to JSON file (masked_text + bundles)
+private-layer protect "Email john@example.com" --encrypt > out.json
+
+# Contents of out.json: {"masked_text": "...", "bundles": [...]}
+
+# Decrypt: read masked_text and bundles from the same JSON
+private-layer decrypt "$(jq -r '.masked_text' out.json)" "$(jq -c '.bundles' out.json)"
+```
+
+Without saving to a file (same session):
 
 ```bash
 export TOKEN_KEY_HEX=$(openssl rand -hex 32)
-private-layer protect "Email john@example.com" --encrypt > out.json
-private-layer decrypt "$(jq -r '.masked_text' out.json)" "$(jq -c '.bundles' out.json)"
+private-layer protect "Secret: alice@example.com" --encrypt
+# output to stdout; for decrypt copy masked_text and bundles or save to out.json
 ```
 
 **SDK:** `private_layer.pipeline.encrypt.encrypt_spans` and `private_layer.pipeline.decrypt.decrypt_placeholders`.
@@ -125,7 +140,10 @@ private-layer detect "John in Berlin" -p spacy --format text
 # Restore
 private-layer restore 'Contact [PII_1]' '[{"placeholder":"[PII_1]","label":"email","original_text":"jane@example.com"}]'
 
-# Encryption → see Encryption section above
+# Encryption: write to JSON and decrypt from JSON (pip install -e ".[crypto]", TOKEN_KEY_HEX)
+export TOKEN_KEY_HEX=$(openssl rand -hex 32)
+private-layer protect "Secret: alice@example.com" --encrypt > out.json
+private-layer decrypt "$(jq -r '.masked_text' out.json)" "$(jq -c '.bundles' out.json)"
 
 # JSONL
 echo '{"text":"Email alice@test.com"}' > in.jsonl
