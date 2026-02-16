@@ -34,7 +34,7 @@ build/
 out.json
 out.
 
-# Local models (run scripts/download_gliner_model.py to create)
+# Local models (run scripts/download_model.py to create)
 src/private_layer/detectors/models/private-layer-v1/
 
 # Optional: uncomment if you keep model cache in repo

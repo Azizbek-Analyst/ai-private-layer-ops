@@ -15,6 +15,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+local_model = [
+    "gliner>=0.2.9",
+    "torch>=2.2",
+    "transformers>=4.38",
+]
 gliner = [
     "gliner>=0.2.9",
     "torch>=2.2",

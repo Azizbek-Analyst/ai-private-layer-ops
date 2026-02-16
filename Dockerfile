@@ -1,8 +1,9 @@
+# CLI-only image (no server). Run: docker run --rm IMAGE private-layer --help
 FROM python:3.11-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y build-essential && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential && rm -rf /var/lib/apt/lists/*
 
 COPY pyproject.toml .
 COPY src ./src
@@ -10,10 +11,8 @@ COPY config.example.yml .
 
 RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir .
 
-RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
-USER appuser
+# Optional: install local_model extra and add detectors/models for -d --local-model
+# RUN pip install --no-cache-dir ".[local_model]" && python -c "from pathlib import Path; (Path('src/private_layer/detectors/models')).mkdir(parents=True, exist_ok=True)"
 
-EXPOSE 8080
-
-ENV PORT=8080 HOST=0.0.0.0
-CMD ["sh", "-c", "exec python -m uvicorn private_layer.api.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
+ENV PYTHONUNBUFFERED=1
+ENTRYPOINT ["private-layer"]

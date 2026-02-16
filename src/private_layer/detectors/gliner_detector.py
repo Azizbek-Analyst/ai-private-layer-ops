@@ -1,4 +1,4 @@
-"""GLiNER-based detector (optional extra)."""
+"""NER model detector (optional extra; Hub or local path)."""
 from pathlib import Path
 from typing import Any, Dict
 
@@ -8,7 +8,6 @@ from private_layer.core.types import DetectionResult, Span
 
 from .base import Detector
 
-# Lazy import and cache (value type: gliner.GLiNER)
 _MODEL_CACHE: Dict[str, Any] = {}
 
 
@@ -21,18 +20,14 @@ def _is_local_model_path(model_name: str) -> bool:
 
 
 class GLiNERDetector(Detector):
-    """GLiNER NER detector. Requires: pip install ai-private-layer[gliner].
-    Model can be a Hugging Face ID (e.g. urchade/gliner_multi-v2.1) or a local
-    directory path (e.g. private-layer-v1 from scripts/download_gliner_model.py).
-    Local paths are loaded with local_files_only=True (no network).
-    """
+    """NER model detector (Hub ID or local path). Requires: pip install ai-private-layer[local_model]."""
 
     def __init__(self, config: Config) -> None:
         try:
             from gliner import GLiNER
         except ImportError as e:
             raise ImportError(
-                "GLiNER not installed. Install with: pip install ai-private-layer[gliner]"
+                "NER model detector requires: pip install ai-private-layer[local_model]"
             ) from e
         self._config = config
         self._Gliner = GLiNER

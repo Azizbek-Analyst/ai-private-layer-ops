@@ -4,8 +4,8 @@ Download the default NER model and save it to detectors/models/private-layer-v1.
 After running, use: private-layer detect "text" -d --local-model private-layer-v1
 
 Run from repo root:
-  pip install -e ".[gliner]"
-  python scripts/download_gliner_model.py
+  pip install -e ".[local_model]"
+  python scripts/download_model.py
 
 Creates: src/private_layer/detectors/models/private-layer-v1/
 """
@@ -16,7 +16,7 @@ def main() -> None:
     try:
         from gliner import GLiNER
     except ImportError:
-        print("Install GLiNER first: pip install -e \".[gliner]\"")
+        print("Install the local model extra first: pip install -e \".[local_model]\"")
         raise SystemExit(1)
 
     repo_root = Path(__file__).resolve().parent.parent

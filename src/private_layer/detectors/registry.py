@@ -23,15 +23,15 @@ def _load_detector(detector_type: str, config: Config) -> Detector:
             return LocalModelDetector(config)
         except ImportError as e:
             raise ConfigError(
-                "Local model detector requires: pip install ai-private-layer[gliner]"
+                "Local model detector requires: pip install ai-private-layer[local_model]"
             ) from e
-    if t == "gliner":
+    if t in ("gliner", "ner"):
         try:
             from .gliner_detector import GLiNERDetector
             return GLiNERDetector(config)
         except ImportError as e:
             raise ConfigError(
-                "GLiNER detector requires: pip install ai-private-layer[gliner]"
+                "NER model detector requires: pip install ai-private-layer[local_model]"
             ) from e
     if t == "presidio":
         try:
@@ -84,6 +84,6 @@ def get_detector(config: Config) -> Detector:
         return inst
     if t not in _REGISTRY:
         raise ConfigError(
-            f"Unknown detector type: {t!r}. Use: regex, local, gliner, presidio, spacy, spacy_trf, flair, transformers, scrubadub_spacy"
+            f"Unknown detector type: {t!r}. Use: regex, local, ner, presidio, spacy, spacy_trf, flair, transformers, scrubadub_spacy"
         )
     return _REGISTRY[t](config)

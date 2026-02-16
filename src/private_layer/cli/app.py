@@ -45,7 +45,7 @@ def _config_with_detector_options(
         if local_model is not None:
             path = local_model.strip()
             t = cfg.detector_type
-            if t == "gliner":
+            if t in ("gliner", "ner"):
                 cfg = replace(cfg, gliner_model=path)
             elif t in ("spacy", "spacy_trf"):
                 cfg = replace(cfg, spacy_model=path)
@@ -68,7 +68,7 @@ def detect_cmd(
     use_local: bool = typer.Option(False, "-d", "--use-local", help="Use local model from detectors/models/; requires --local-model"),
     detector: Optional[str] = typer.Option(
         None, "--detector", "-p",
-        help="Detector type: regex, presidio, gliner, spacy, spacy_trf, flair, transformers, scrubadub_spacy",
+        help="Detector type: regex, presidio, ner, spacy, spacy_trf, flair, transformers, scrubadub_spacy",
     ),
     local_model: Optional[str] = typer.Option(None, "--local-model", "-m", help="Local model name (e.g. private-layer-v1); use with -d"),
     presidio_language: Optional[str] = typer.Option(None, "--presidio-language", help="Presidio language (e.g. en)"),
@@ -109,7 +109,7 @@ def protect_cmd(
     use_local: bool = typer.Option(False, "-d", "--use-local", help="Use local model from detectors/models/; requires --local-model"),
     detector: Optional[str] = typer.Option(
         None, "--detector", "-p",
-        help="Detector type: regex, presidio, gliner, spacy, spacy_trf, flair, transformers, scrubadub_spacy",
+        help="Detector type: regex, presidio, ner, spacy, spacy_trf, flair, transformers, scrubadub_spacy",
     ),
     local_model: Optional[str] = typer.Option(None, "--local-model", "-m", help="Local model name (e.g. private-layer-v1); use with -d"),
     presidio_language: Optional[str] = typer.Option(None, "--presidio-language", help="Presidio language (e.g. en)"),
@@ -188,16 +188,12 @@ def _protect_encrypt(
         schema="v1",
         salt=salt,
     )
-    if format == "text":
-        typer.echo(masked)
-        for b in bundles:
-            typer.echo(f"  bundle id={b.id} (use for decrypt)")
-    else:
-        out = {
-            "masked_text": masked,
-            "bundles": [b.to_dict() for b in bundles],
-        }
-        typer.echo(json.dumps(out, indent=2, ensure_ascii=False))
+    # With --encrypt always output JSON (masked_text + bundles) for consistent decrypt usage
+    out = {
+        "masked_text": masked,
+        "bundles": [b.to_dict() for b in bundles],
+    }
+    typer.echo(json.dumps(out, indent=2, ensure_ascii=False))
 
 
 @app.command("restore")
@@ -244,7 +240,7 @@ def dataset_protect(
     text_field: str = typer.Option("text", "--text-field"),
     config: Optional[Path] = typer.Option(None, "--config", "-c", path_type=Path),
     use_local: bool = typer.Option(False, "-d", "--use-local", help="Use local model from detectors/models/; requires --local-model"),
-    detector: Optional[str] = typer.Option(None, "--detector", "-p", help="Detector type (e.g. presidio, gliner, spacy, flair, transformers, scrubadub_spacy)"),
+    detector: Optional[str] = typer.Option(None, "--detector", "-p", help="Detector type (e.g. presidio, ner, spacy, flair, transformers, scrubadub_spacy)"),
     local_model: Optional[str] = typer.Option(None, "--local-model", "-m", help="Local model name (e.g. private-layer-v1); use with -d"),
     presidio_language: Optional[str] = typer.Option(None, "--presidio-language"),
     presidio_entities: Optional[str] = typer.Option(None, "--presidio-entities"),

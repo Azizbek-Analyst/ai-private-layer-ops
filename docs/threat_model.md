@@ -7,9 +7,9 @@
 
 ## Out of scope (v0.1)
 
-- **Key management**: No KMS/HSM; optional Fernet is demo-level only.
+- **Key management**: No KMS/HSM; optional encryption is demo-level.
 - **Multi-tenant / auth**: No API keys, no tenant allowlists in OSS.
-- **Guarantees on detector accuracy**: Regex and GLiNER can miss or over-detect; use for dev/tooling, not as sole control for compliance.
+- **Guarantees on detector accuracy**: Regex and NER models can miss or over-detect; use for dev/tooling, not as sole control for compliance.
 
 ## Recommendations
 

@@ -1,11 +1,11 @@
-# See docs/config_reference.md. detector_type: regex | local | gliner | presidio | spacy | ...
+# See docs/config_reference.md. detector_type: regex | local | ner | presidio | spacy | ...
 detector_type: regex
 threshold: 0.5
 per_label_thresholds: {}
 labels: []
 
 # Local model: detector_type: local, local_model_name: "private-layer-v1"
-# Other detectors: gliner_model, spacy_model, flair_model, transformers_model, presidio_language, etc.
+# Other detectors: spacy_model, flair_model, transformers_model, presidio_language, etc.
 
 regex_rules:
   email:
