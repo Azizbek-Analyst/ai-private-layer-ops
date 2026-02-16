@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-private-layer"
+version = "0.1.0"
+description = "PII detection and tokenization — replace sensitive text with placeholders and a reversible mapping (SDK + CLI)."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+dependencies = [
+    "typer>=0.9.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+gliner = [
+    "gliner>=0.2.9",
+    "torch>=2.2",
+    "transformers>=4.38",
+]
+crypto = [
+    "cryptography>=42.0",
+]
+presidio = [
+    "presidio-analyzer>=2.2.0",
+]
+spacy = [
+    "spacy>=3.0",
+]
+spacy_trf = [
+    "spacy[transformers]>=3.0",
+]
+flair = [
+    "flair>=0.12.0",
+]
+transformers_ner = [
+    "transformers>=4.20",
+    "torch>=1.10",
+]
+scrubadub = [
+    "scrubadub>=2.0",
+]
+dev = [
+    "pytest>=7.0",
+    "cryptography>=42.0",
+]
+
+[project.scripts]
+private-layer = "private_layer.cli.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

@@ -1,0 +1,4 @@
+# Dev dependencies. Prefer: pip install -e ".[dev]"
+-r requirements.txt
+pytest>=7.0
+cryptography>=42.0

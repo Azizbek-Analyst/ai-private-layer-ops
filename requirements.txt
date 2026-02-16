@@ -1,0 +1,6 @@
+# Install the project instead: pip install -e .
+# Optional: pip install -e ".[gliner]" for local model, ".[presidio]" etc. for other detectors.
+# See pyproject.toml for all dependencies.
+
+typer>=0.9.0
+pyyaml>=6.0

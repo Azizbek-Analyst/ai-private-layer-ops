@@ -1,0 +1,41 @@
+# Environment and secrets
+.env
+.env.local
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+.eggs/
+*.egg-info/
+*.egg
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build and cache
+dist/
+build/
+*.log
+.cache/
+out.json
+out.
+
+# Local models (run scripts/download_gliner_model.py to create)
+src/private_layer/detectors/models/private-layer-v1/
+
+# Optional: uncomment if you keep model cache in repo
+# .gliner_cache/

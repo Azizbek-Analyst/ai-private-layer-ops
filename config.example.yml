@@ -1,0 +1,28 @@
+# See docs/config_reference.md. detector_type: regex | local | gliner | presidio | spacy | ...
+detector_type: regex
+threshold: 0.5
+per_label_thresholds: {}
+labels: []
+
+# Local model: detector_type: local, local_model_name: "private-layer-v1"
+# Other detectors: gliner_model, spacy_model, flair_model, transformers_model, presidio_language, etc.
+
+regex_rules:
+  email:
+    pattern: "(?i)\\b[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}\\b"
+  phone:
+    pattern: "(?<!\\d)(?:\\+\\d{1,3}\\s?)?(?:\\(\\d{2,4}\\)\\s?)?[\\d\\-\\s]{6,15}(?!\\d)"
+  iban:
+    pattern: "\\b[A-Z]{2}\\d{2}[A-Z0-9]{11,30}\\b"
+  credit_card:
+    pattern: "\\b(?:\\d[ -]*?){13,19}\\b"
+  ip:
+    pattern: "\\b(?:(?:2(?:5[0-5]|[0-4]\\d))|(?:1?\\d?\\d))(?:\\.(?:2(?:5[0-5]|[0-4]\\d)|1?\\d?\\d)){3}\\b"
+
+tokenization:
+  placeholder_format: "[PII_{i}]"
+  immutable: true
+  include_hash: false
+
+output:
+  include_mapping: true
