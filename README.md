@@ -16,7 +16,6 @@ must comply with strict data protection requirements.
 
 This repository contains the **operational developer tooling** for the AI Private Layer ecosystem and is **not** the full backend/server – it is a library and CLI that can be embedded into your own services, data pipelines, and automation.
 
----
 
 ### 🚀 Quick start
 
@@ -30,7 +29,6 @@ Output includes:
 - **masked_text** with placeholders like `[PII_1]`, `[PII_2]`, …
 - **mapping** – a JSON-serializable structure that lets you restore the original text
 
----
 
 ### 🏗 Architecture overview
 
@@ -45,7 +43,6 @@ Output includes:
 
 For more details see `docs/architecture.md`.
 
----
 
 ### 📦 Installation
 
@@ -57,7 +54,7 @@ pip install -e .
 
 **Extras (optional):**
 
-- **Local model support**: `pip install -e ".[local_model]"` (then add your model files under `src/private_layer/detectors/models/` or run `python scripts/download_model.py` once)
+- **Local model support**: `pip install -e ".[local_model]"` (then add your model files under `src/private_layer/detectors/models/`)
 - **Presidio detector**: `pip install -e ".[presidio]"`
 - **spaCy detector**: `pip install -e ".[spacy]"` or `.[spacy_trf]`
 - **Flair detector**: `pip install -e ".[flair]"`
@@ -80,7 +77,7 @@ private-layer detect "Email me at john@example.com" --format text
 private-layer protect "Email me at john@example.com"
 ```
 
----
+
 
 ### 🧠 CLI usage
 
@@ -111,7 +108,7 @@ If `private-layer` is not on `PATH`:
 PYTHONPATH=src python -m private_layer detect "text"
 ```
 
----
+
 
 ### 📦 SDK usage (Python)
 
@@ -131,7 +128,7 @@ print(original)
 
 See `examples/quickstart.py` and `examples/dataset_demo.py` for more complete flows.
 
----
+
 
 ### ⚙️ Local models
 
@@ -140,15 +137,6 @@ Local models live under:
 ```text
 src/private_layer/detectors/models/<model_name>/
 ```
-
-**One-time setup for the default model:**
-
-```bash
-pip install -e ".[local_model]"
-python scripts/download_model.py
-```
-
-This creates `src/private_layer/detectors/models/private-layer-v1/`.
 
 **Usage:**
 
@@ -160,12 +148,11 @@ private-layer protect "John lives in Berlin" -d --local-model private-layer-v1 -
 **Model requirements:**
 
 - Hugging Face–style directory with `config.json`, tokenizer files, and weights **or**
-- A model class exposing `predict_entities(text, labels, threshold=...)` (used by the local detector), **or**
-- A GLiNER checkpoint saved via `GLiNER.save_pretrained`, which the local detector can load via `GLiNER.from_pretrained`.
+- A model class exposing `predict_entities(text, labels, threshold=...)` (used by the local detector).
 
-Details: `src/private_layer/detectors/local_model_detector.py` and `scripts/download_model.py`.
+Details: `src/private_layer/detectors/local_model_detector.py`.
 
----
+
 
 ### 🧠 Configuration
 
@@ -194,7 +181,7 @@ output:
 
 If no config is provided, a built-in default config (regex-based) is used. See `config.example.yml` and `docs/config_reference.md` for all supported options.
 
----
+
 
 ### 🔐 Encryption (optional)
 
@@ -222,7 +209,7 @@ Internally encryption uses **AES-GCM** over PII-bearing bundles; placeholders re
 
 For lower-level APIs, see `private_layer.pipeline.encrypt` and `private_layer.pipeline.decrypt`.
 
----
+
 
 ### 📁 Examples
 
@@ -253,7 +240,7 @@ echo '{"text":"Email alice@test.com"}' > in.jsonl
 private-layer dataset protect -i in.jsonl -o out.jsonl -d --local-model private-layer-v1
 ```
 
----
+
 
 ### 🧪 Tests
 
@@ -269,7 +256,7 @@ Focus areas:
 - **No PII leakage** in logs or test fixtures
 - **Detector quality**: precision/recall for different backends
 
----
+
 
 ### 🙌 Contributing & support
 
@@ -281,7 +268,7 @@ Focus areas:
 
 For more about the broader ecosystem, visit `https://private-layer.ai`.
 
----
+
 
 ### 📜 License
 
