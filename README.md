@@ -1,138 +1,226 @@
-# AI Private Layer
+## AI Private Layer — OPS SDK & CLI
 
-PII detection and tokenization: replace sensitive text with placeholders and a reversible mapping (SDK + CLI, no server).
+Standalone PII detection and tokenization toolkit (SDK + CLI, no server) for masking sensitive data and creating reversible mappings.
 
-## Quick start
+This repository contains the **operational developer tooling** for the AI Private Layer ecosystem:
+
+- **PII detection** via regex and pluggable NER backends
+- **Tokenization** into immutable placeholders (e.g. `[PII_1]`, `[PII_2]`)
+- **Reversible mappings** to restore original text
+- **Optional encryption** for mappings
+- **CLI + Python SDK** for ops workflows and automation
+
+This is **not** the full backend/server – it is a library and CLI that can be embedded into your own services, data pipelines, and automation.
+
+---
+
+### 🚀 Quick start
 
 ```bash
 pip install -e .
 private-layer protect "Email me at john@example.com or call +1 555 123 4567."
 ```
 
-Output: `masked_text` with `[PII_1]`, `[PII_2]`, … and a `mapping` to restore.
+Output includes:
 
-## Run from scratch (venv)
+- **masked_text** with placeholders like `[PII_1]`, `[PII_2]`, …
+- **mapping** – a JSON-serializable structure that lets you restore the original text
+
+---
+
+### 🏗 Architecture overview
+
+- **Core API**: `detect(text)`, `protect(text)`, `restore(masked_text, mapping)` (see `private_layer` package).
+- **Detectors layer**: pluggable backends (`regex`, `local`, `ner`, `presidio`, `spacy`, `spacy_trf`, `flair`, `transformers`, `scrubadub_spacy`) selected via config or CLI.
+- **Pipeline**:
+  - detect candidate PII spans,
+  - resolve overlaps deterministically,
+  - replace spans with placeholders and build a reversible mapping,
+  - restore placeholders back to original text when needed.
+- **OPS focus**: this package is the **SDK & CLI** used by other Private Layer services. It can run fully locally (no network calls) and is suitable for embedding into ETL jobs, notebooks, and backend services.
+
+For more details see `docs/architecture.md`.
+
+---
+
+### 📦 Installation
+
+From the repo root:
+
+```bash
+pip install -e .
+```
+
+**Extras (optional):**
+
+- **Local model support**: `pip install -e ".[local_model]"` (then add your model files under `src/private_layer/detectors/models/` or run `python scripts/download_model.py` once)
+- **Presidio detector**: `pip install -e ".[presidio]"`
+- **spaCy detector**: `pip install -e ".[spacy]"` or `.[spacy_trf]`
+- **Flair detector**: `pip install -e ".[flair]"`
+- **Transformers NER detector**: `pip install -e ".[transformers_ner]"`
+- **Scrubadub detector**: `pip install -e ".[scrubadub]"`
+- **Encryption**: `pip install -e ".[crypto]"`
+- **Dev tools & tests**: `pip install -e ".[dev]"`
+
+All dependencies and extras are defined in `pyproject.toml`.
+
+To run from a fresh virtualenv:
 
 ```bash
 cd ai-private-layer-ops
 python3 -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -e .
 private-layer --help
 private-layer detect "Email me at john@example.com" --format text
 private-layer protect "Email me at john@example.com"
 ```
 
-- **Local model:** `pip install -e ".[local_model]"`; add your model under `src/private_layer/detectors/models/` and use `-d --local-model NAME` (see [Local model](#local-model-no-engine-name-in-cli)).
-- **Encryption:** `pip install -e ".[crypto]"`, set `TOKEN_KEY_HEX` (see [Encryption](#encryption-optional)).
+---
 
-## Installing dependencies
+### 🧠 CLI usage
 
-- **Base (regex only):** `pip install -e .`
-- **Local model (recommended):** `pip install -e ".[local_model]"` (then add your model files under `src/private_layer/detectors/models/`, see below)
-- **Other detectors:** `pip install -e ".[presidio]"`, `.[spacy]`, `.[flair]`, `.[transformers_ner]`, `.[scrubadub]`
-- **Encryption:** `pip install -e ".[crypto]"`
-- **Tests:** `pip install -e ".[dev]"`
-
-All dependencies are in **pyproject.toml**.
-
-## Local model (no engine name in CLI)
-
-Models live under `src/private_layer/detectors/models/`.
-
-### 1. Install extra
+**Basic commands:**
 
 ```bash
-pip install -e ".[local_model]"
+# Detect PII
+private-layer detect "Email me at john@example.com or +1 555 123 4567" --format text
+
+# Protect text (mask + mapping)
+private-layer protect "Email me at john@example.com"
+
+# Restore original text from mapping
+private-layer restore 'Contact [PII_1]' \
+  '[{"placeholder":"[PII_1]","label":"email","original_text":"jane@example.com"}]'
 ```
 
-### 2. Add your model
+**Detector selection and options:**
 
-- Create a directory `src/private_layer/detectors/models/<your-model-name>/`.
-- Put your model files there. Recommended:
-  - Hugging Face-style `config.json` + tokenizer + weights (e.g. via `AutoTokenizer.from_pretrained(...).save_pretrained(path)` and `AutoModel.from_pretrained(...).save_pretrained(path)`), or
-  - A custom model class in that folder that exposes `predict_entities(text, labels, threshold=...)`.
+- **`-p, --detector`**: choose backend (`regex`, `local`, `ner`, `presidio`, `spacy`, `spacy_trf`, `flair`, `transformers`, `scrubadub_spacy`)
+- **`-d, --use-local` + `-m, --local-model NAME`**: use local model from `detectors/models/NAME`
+- **`-c, --config PATH`**: YAML config file
+- **`-f, --format`**: output format (`json` | `text`)
 
-If the directory contains `config.json`, the detector first tries a **bare transformers load** (`AutoTokenizer` + `AutoModel`). If the loaded object has `predict_entities(...)`, that method is used; otherwise it falls back to the optional NER library behind the `local_model` extra.
-
-### 3. Use from CLI
+If `private-layer` is not on `PATH`:
 
 ```bash
-private-layer detect "John lives in Berlin" -d --local-model private-layer-v1
-private-layer protect "text" -d --local-model private-layer-v1
+PYTHONPATH=src python -m private_layer detect "text"
 ```
 
-For other detectors use `--detector` / `-p`: e.g. `-p presidio`, `-p spacy`.
+---
 
-## SDK
+### 📦 SDK usage (Python)
 
 ```python
 from private_layer import detect, protect, restore
 
-r = protect("Contact jane@example.com")
-print(r.masked_text)   # "Contact [PII_1]"
-original = restore(r.masked_text, r.mapping)
+result = protect("Contact jane@example.com")
+print(result.masked_text)  # "Contact [PII_1]"
+
+original = restore(result.masked_text, result.mapping)
+print(original)
 ```
 
-- **detect(text, config=None)** → spans
-- **protect(text, ...)** → masked_text, mapping
-- **restore(masked_text, mapping)** → str
+- **`detect(text, config=None)`** → list of detected spans
+- **`protect(text, ...)`** → `masked_text` and `mapping`
+- **`restore(masked_text, mapping)`** → original string
 
-## CLI
+See `examples/quickstart.py` and `examples/dataset_demo.py` for more complete flows.
 
-| Command | Description |
-|---------|-------------|
-| `detect TEXT` | Print detected PII spans |
-| `protect TEXT` | Mask text, output mapping |
-| `restore MASKED MAPPING_JSON` | Restore original text |
-| `protect TEXT --encrypt` | Mask + encrypt (bundles for decrypt) |
-| `decrypt MASKED BUNDLES_JSON` | Decrypt and restore |
-| `dataset protect -i in.jsonl -o out.jsonl` | Protect `text` field in JSONL |
+---
 
-Options: `-c` config, `-d --local-model NAME` (local model), `-p` detector type (presidio, spacy, …), `-f` json|text.
+### ⚙️ Local models
 
-## Config
+Local models live under:
 
-Single YAML: `detector_type`, regex rules, thresholds. See `config.example.yml` and [docs/config_reference.md](docs/config_reference.md). If `--config` path does not exist, default (regex) is used.
+```text
+src/private_layer/detectors/models/<model_name>/
+```
 
-## Encryption (optional)
-
-Requires `pip install -e ".[crypto]"` and env `TOKEN_KEY_HEX` (64 hex chars, e.g. `openssl rand -hex 32`).
-
-**CLI — write to JSON and decrypt from JSON:**
+**One-time setup for the default model:**
 
 ```bash
-# Key (once per session or in .env)
-export TOKEN_KEY_HEX=$(openssl rand -hex 32)
+pip install -e ".[local_model]"
+python scripts/download_model.py
+```
 
-# Mask + encrypt: output to JSON file (masked_text + bundles)
+This creates `src/private_layer/detectors/models/private-layer-v1/`.
+
+**Usage:**
+
+```bash
+private-layer detect "John lives in Berlin" -d --local-model private-layer-v1
+private-layer protect "John lives in Berlin" -d --local-model private-layer-v1 --format text
+```
+
+**Model requirements:**
+
+- Hugging Face–style directory with `config.json`, tokenizer files, and weights **or**
+- A model class exposing `predict_entities(text, labels, threshold=...)` (used by the local detector), **or**
+- A GLiNER checkpoint saved via `GLiNER.save_pretrained`, which the local detector can load via `GLiNER.from_pretrained`.
+
+Details: `src/private_layer/detectors/local_model_detector.py` and `scripts/download_model.py`.
+
+---
+
+### 🧠 Configuration
+
+Configuration is a single YAML file (no tenants). Core keys:
+
+```yaml
+detector_type: regex            # regex, local, ner, presidio, spacy, spacy_trf, flair, transformers, scrubadub_spacy
+local_model_name: private-layer-v1
+labels:
+  - email
+  - phone
+threshold: 0.5
+per_label_thresholds:
+  email: 0.6
+  phone: 0.7
+regex_rules:
+  email:
+    pattern: ...
+tokenization:
+  placeholder_format: "[PII_{i}]"
+  immutable: true
+  include_hash: false
+output:
+  include_mapping: true
+```
+
+If no config is provided, a built-in default config (regex-based) is used. See `config.example.yml` and `docs/config_reference.md` for all supported options.
+
+---
+
+### 🔐 Encryption (optional)
+
+Encryption is an **optional** extra that encrypts the mapping bundles while keeping placeholders immutable.
+
+**Install and configure:**
+
+```bash
+pip install -e ".[crypto]"
+export TOKEN_KEY_HEX=$(openssl rand -hex 32)  # 32 bytes hex key
+```
+
+**CLI flow with encryption:**
+
+```bash
+# Mask + encrypt: write masked_text + bundles to JSON
 private-layer protect "Email john@example.com" --encrypt > out.json
 
-# Contents of out.json: {"masked_text": "...", "bundles": [...]}
-
-# Decrypt: read masked_text and bundles from the same JSON
-private-layer decrypt "$(jq -r '.masked_text' out.json)" "$(jq -c '.bundles' out.json)"
+# Decrypt and restore later
+private-layer decrypt "$(jq -r '.masked_text' out.json)" \
+  "$(jq -c '.bundles' out.json)"
 ```
 
-Without saving to a file (same session):
+Internally encryption uses **AES-GCM** over PII-bearing bundles; placeholders remain deterministic and immutable.
 
-```bash
-export TOKEN_KEY_HEX=$(openssl rand -hex 32)
-private-layer protect "Secret: alice@example.com" --encrypt
-# output to stdout; for decrypt copy masked_text and bundles or save to out.json
-```
+For lower-level APIs, see `private_layer.pipeline.encrypt` and `private_layer.pipeline.decrypt`.
 
-**SDK:** `private_layer.pipeline.encrypt.encrypt_spans` and `private_layer.pipeline.decrypt.decrypt_placeholders`.
+---
 
-## Docs
-
-- [Config reference](docs/config_reference.md)
-- [Architecture](docs/architecture.md)
-- [Threat model](docs/threat_model.md)
-
-## Run examples
-
-From repo root after `pip install -e .` (or `.[local_model]` for local model):
+### 📁 Examples
 
 ```bash
 # Regex (default)
@@ -148,7 +236,8 @@ private-layer detect "Hi, I am Jane Doe" -p presidio
 private-layer detect "John in Berlin" -p spacy --format text
 
 # Restore
-private-layer restore 'Contact [PII_1]' '[{"placeholder":"[PII_1]","label":"email","original_text":"jane@example.com"}]'
+private-layer restore 'Contact [PII_1]' \
+  '[{"placeholder":"[PII_1]","label":"email","original_text":"jane@example.com"}]'
 
 # Encryption: write to JSON and decrypt from JSON (pip install -e ".[crypto]", TOKEN_KEY_HEX)
 export TOKEN_KEY_HEX=$(openssl rand -hex 32)
@@ -160,10 +249,36 @@ echo '{"text":"Email alice@test.com"}' > in.jsonl
 private-layer dataset protect -i in.jsonl -o out.jsonl -d --local-model private-layer-v1
 ```
 
-If `private-layer` is not in PATH: `PYTHONPATH=src python -m private_layer detect "text"`.
+---
 
-Python examples: `examples/quickstart.py`, `examples/dataset_demo.py`.
+### 🧪 Tests
 
-## License
+Install dev dependencies and run tests:
+
+```bash
+pip install -e ".[dev]"
+pytest
+```
+
+Focus areas:
+
+- **No PII leakage** in logs or test fixtures
+- **Detector quality**: precision/recall for different backends
+
+---
+
+### 🙌 Contributing & support
+
+- **Issues & ideas**: use the GitHub issue tracker for bug reports and feature requests.
+- **PRs**: see `CONTRIBUTING.md` for guidelines and expectations.
+- **Community standards**: see `CODE_OF_CONDUCT.md`.
+- **Security & disclosure**: see `SECURITY.md`.
+- Please avoid including real PII in code, tests, or issues – use synthetic examples.
+
+For more about the broader ecosystem, visit `https://private-layer.ai`.
+
+---
+
+### 📜 License
 
 Apache-2.0
