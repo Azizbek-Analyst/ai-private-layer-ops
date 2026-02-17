@@ -1,16 +1,20 @@
-## AI Private Layer — OPS SDK & CLI
+# AI Private Layer — OPS SDK & CLI
 
-Standalone PII detection and tokenization toolkit (SDK + CLI, no server) for masking sensitive data and creating reversible mappings.
+A privacy-preserving operational toolkit that enables organizations
+to safely run and integrate AI models in compliance-sensitive environments.
 
-This repository contains the **operational developer tooling** for the AI Private Layer ecosystem:
+AI Private Layer OPS provides:
+- PII detection
+- Masking & reversible tokenization
+- Optional encryption layer
+- Deterministic restoration
+- Model-agnostic architecture
 
-- **PII detection** via regex and pluggable NER backends
-- **Tokenization** into immutable placeholders (e.g. `[PII_1]`, `[PII_2]`)
-- **Reversible mappings** to restore original text
-- **Optional encryption** for mappings
-- **CLI + Python SDK** for ops workflows and automation
+It is designed for regulated industries such as insurance,
+finance, healthcare, and government, where AI adoption
+must comply with strict data protection requirements.
 
-This is **not** the full backend/server – it is a library and CLI that can be embedded into your own services, data pipelines, and automation.
+This repository contains the **operational developer tooling** for the AI Private Layer ecosystem and is **not** the full backend/server – it is a library and CLI that can be embedded into your own services, data pipelines, and automation.
 
 ---
 
