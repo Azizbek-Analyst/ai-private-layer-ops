@@ -35,7 +35,7 @@ build/
 out.json
 out.
 
-# Local models (run scripts/download_model.py to create)
+# Local models (downloaded or added manually under detectors/models/)
 src/private_layer/detectors/models/private-layer-v1/
 
 # Optional: uncomment if you keep model cache in repo

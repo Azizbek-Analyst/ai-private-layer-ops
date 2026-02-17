@@ -23,13 +23,13 @@ private-layer detect "Email me at john@example.com" --format text
 private-layer protect "Email me at john@example.com"
 ```
 
-- **Local model:** `pip install -e ".[local_model]"`, then `python scripts/download_model.py` once; use `-d --local-model private-layer-v1` (see [Local model](#local-model-no-engine-name-in-cli)).
+- **Local model:** `pip install -e ".[local_model]"`; add your model under `src/private_layer/detectors/models/` and use `-d --local-model NAME` (see [Local model](#local-model-no-engine-name-in-cli)).
 - **Encryption:** `pip install -e ".[crypto]"`, set `TOKEN_KEY_HEX` (see [Encryption](#encryption-optional)).
 
 ## Installing dependencies
 
 - **Base (regex only):** `pip install -e .`
-- **Local model (recommended):** `pip install -e ".[local_model]"` then `python scripts/download_model.py` once → `detectors/models/private-layer-v1/`
+- **Local model (recommended):** `pip install -e ".[local_model]"` (then add your model files under `src/private_layer/detectors/models/`, see below)
 - **Other detectors:** `pip install -e ".[presidio]"`, `.[spacy]`, `.[flair]`, `.[transformers_ner]`, `.[scrubadub]`
 - **Encryption:** `pip install -e ".[crypto]"`
 - **Tests:** `pip install -e ".[dev]"`
@@ -38,21 +38,31 @@ All dependencies are in **pyproject.toml**.
 
 ## Local model (no engine name in CLI)
 
-Models live under `src/private_layer/detectors/models/`. One-time setup:
+Models live under `src/private_layer/detectors/models/`.
+
+### 1. Install extra
 
 ```bash
 pip install -e ".[local_model]"
-python scripts/download_model.py
 ```
 
-Then use `-d` and `--local-model NAME`:
+### 2. Add your model
+
+- Create a directory `src/private_layer/detectors/models/<your-model-name>/`.
+- Put your model files there. Recommended:
+  - Hugging Face-style `config.json` + tokenizer + weights (e.g. via `AutoTokenizer.from_pretrained(...).save_pretrained(path)` and `AutoModel.from_pretrained(...).save_pretrained(path)`), or
+  - A custom model class in that folder that exposes `predict_entities(text, labels, threshold=...)`.
+
+If the directory contains `config.json`, the detector first tries a **bare transformers load** (`AutoTokenizer` + `AutoModel`). If the loaded object has `predict_entities(...)`, that method is used; otherwise it falls back to the optional NER library behind the `local_model` extra.
+
+### 3. Use from CLI
 
 ```bash
 private-layer detect "John lives in Berlin" -d --local-model private-layer-v1
 private-layer protect "text" -d --local-model private-layer-v1
 ```
 
-**Bare load (transformers only):** if the model dir has `config.json`, the detector loads with `transformers` (AutoTokenizer + AutoModel). If the model exposes `predict_entities(text, labels, threshold=...)`, it is used; otherwise fallback to the optional NER library. For other detectors use `--detector` / `-p`: e.g. `-p presidio`, `-p spacy`.
+For other detectors use `--detector` / `-p`: e.g. `-p presidio`, `-p spacy`.
 
 ## SDK
 
@@ -129,7 +139,7 @@ From repo root after `pip install -e .` (or `.[local_model]` for local model):
 private-layer detect "Email me at john@example.com or +1 555 123 4567" --format text
 private-layer protect "Email me at john@example.com"
 
-# Local model (after download_model.py)
+# Local model (model folder under src/private_layer/detectors/models)
 private-layer detect "John lives in Berlin" -d --local-model private-layer-v1
 private-layer protect "John lives in Berlin" -d --local-model private-layer-v1 --format text
 
