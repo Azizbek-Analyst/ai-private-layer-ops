@@ -16,6 +16,12 @@ must comply with strict data protection requirements.
 
 This repository contains the **operational developer tooling** for the AI Private Layer ecosystem and is **not** the full backend/server – it is a library and CLI that can be embedded into your own services, data pipelines, and automation.
 
+**Using AI in regulated environments and agents**
+
+The diagram below shows how to use the model in practice: safely integrating AI in regulated industries and in agent workflows.
+
+![Using AI in regulated environments and agents — detection, masking, and safe model usage](docs/regulated-ai-usage.webp)
+
 
 ### 🚀 Quick start
 
