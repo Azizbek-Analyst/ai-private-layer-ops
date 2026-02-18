@@ -266,13 +266,15 @@ Focus areas:
 
 ### 🙌 Contributing & support
 
+This is my first open-source project in the **secure AI** space. I’d be glad to hear from you — feedback, ideas, or just a “hello”. You can reach me by **email** ([support@private-layer.ai](mailto:support@private-layer.ai)), **Telegram** ([@azizbek_mwa](https://t.me/azizbek_mwa)), or **Discord** (azizbek_kzt). My mission is to make AI **accessible and safe for everyone**.
+
 - **Issues & ideas**: use the GitHub issue tracker for bug reports and feature requests.
 - **PRs**: see `CONTRIBUTING.md` for guidelines and expectations.
 - **Community standards**: see `CODE_OF_CONDUCT.md`.
 - **Security & disclosure**: see `SECURITY.md`.
 - Please avoid including real PII in code, tests, or issues – use synthetic examples.
 
-For more about the broader ecosystem, visit `https://private-layer.ai`.
+For more about the broader ecosystem, visit [private-layer.ai](https://private-layer.ai).
 
 
 
