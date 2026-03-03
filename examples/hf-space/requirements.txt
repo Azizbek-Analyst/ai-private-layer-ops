@@ -1,0 +1,4 @@
+gradio>=4.0.0
+ai-private-layer[crypto] @ git+https://github.com/Azizbek-Analyst/ai-private-layer-ops.git
+
+

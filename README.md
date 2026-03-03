@@ -217,6 +217,14 @@ For lower-level APIs, see `private_layer.pipeline.encrypt` and `private_layer.pi
 
 
 
+### 🌟 Demo Applications
+
+Check out these full-stack applications demonstrating how to integrate the **AI Private Layer** in real-world scenarios:
+
+- 💬 **[Chat Assistant Demo](https://github.com/Azizbek-Analyst/ai_private_layer_chat_demo)**: A text-based AI chat application with PII detection, masking, and restoration.
+- 🎙️ **[Voice Agent Demo](https://github.com/Azizbek-Analyst/ai_private_layer_voice_demo)**: A real-time voice-to-voice AI agent featuring automated privacy-preserving data processing.
+
+
 ### 📁 Examples
 
 ```bash
