@@ -219,10 +219,16 @@ For lower-level APIs, see `private_layer.pipeline.encrypt` and `private_layer.pi
 
 ### 🌟 Demo Applications
 
-Check out these full-stack applications demonstrating how to integrate the **AI Private Layer** in real-world scenarios:
+Check out these full-stack applications and demos showing how to integrate the **AI Private Layer** in real-world scenarios:
 
-- 💬 **[Chat Assistant Demo](https://github.com/Azizbek-Analyst/ai_private_layer_chat_demo)**: A text-based AI chat application with PII detection, masking, and restoration.
-- 🎙️ **[Voice Agent Demo](https://github.com/Azizbek-Analyst/ai_private_layer_voice_demo)**: A real-time voice-to-voice AI agent featuring automated privacy-preserving data processing.
+- 💬 **[Chat Assistant Demo](https://github.com/Azizbek-Analyst/ai_private_layer_chat_demo)**
+  A customer-facing text chat interface. Shows how to seamlessly run PII detection on user messages, send masked text to an LLM, and restore the original data before displaying the response to the user.
+
+- 🎙️ **[Voice Agent Demo](https://github.com/Azizbek-Analyst/ai_private_layer_voice_demo)**
+  A real-time AI voice assistant (built with Pipecat). Demonstrates how to handle streaming audio and transcripts, intercepting sensitive information during a live phone call and safely processing it behind the scenes before reaching the LLM.
+
+- 🚀 **[Hugging Face Space Demo](https://huggingface.co/spaces/AzizbekHead/private-layer-oss-example)**
+  An interactive web UI where you can test the core PII detection, masking, and restoration features live in your browser without writing any code.
 
 
 ### 📁 Examples
