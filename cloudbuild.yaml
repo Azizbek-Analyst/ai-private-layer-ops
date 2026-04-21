@@ -34,8 +34,7 @@ steps:
       - 'us-central1'
       - '--platform'
       - 'managed'
-      - '--allow-unauthenticated'
-      # Or use --no-allow-unauthenticated for authenticated access
+      - '--no-allow-unauthenticated'
       - '--memory'
       - '4Gi'
       - '--cpu'
